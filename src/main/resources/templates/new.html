@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>new</title>
+</head>
+<body>
+<form th:method="POST" th:action="@{/user}" th:object="${user}">
+    <label for="username">Введите имя</label>
+    <input type="text" id="username" th:field="*{username}"/>
+    <br/>
+    <label for="roles">Выберите роли</label>
+    <select id="roles" th:field="*{roles}" multiple>
+        <option th:each="role : ${availableRoles}" th:value="${role.id}" th:text="${role.role}"></option>
+    </select>
+    <br/>
+    <label for="email">Введите почту</label>
+    <input type="email" id="email" th:field="*{email}"/>
+    <br/>
+    <label for="password">Введите пароль</label>
+    <input type="password" id="password" th:field="*{password}"/>
+    <br/>
+    <input type="submit" value="Create"/>
+</form>
+<br/>
+</body>
+</html>

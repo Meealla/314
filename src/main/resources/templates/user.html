@@ -20,7 +20,7 @@
         <td th:text="${userh.username}">Имя</td>
         <td th:text="${userh.email}">E-mail</td>
         <td>
-        <span th:each="role : ${userh.roles}" th:text="${role.role}"></span>
+            <span th:each="role : ${userh.roles}" th:text="${role.role}"></span>
         </td>
     </tr>
     </tbody>

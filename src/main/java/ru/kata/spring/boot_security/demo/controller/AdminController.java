@@ -35,6 +35,7 @@ public class AdminController {
         model.addAttribute("roles", roleService.getAllRoles());
         return "new";
     }
+
     @PostMapping
     public String createUser(@ModelAttribute("user") User user) {
         userService.createUser(user);

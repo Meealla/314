@@ -29,7 +29,7 @@ public class UserController {
         String username = principal.getName();
         User user = userService.findUserByUserName(username);
         if (user != null) {
-            model.addAttribute("user", user);
+            model.addAttribute("userh", user);
             return "user";
         } else {
             return "redirect:/login";

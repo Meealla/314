@@ -24,7 +24,8 @@ public class Role implements GrantedAuthority {
     private Long id;
 
 
-    @ManyToMany(mappedBy = "roles", fetch = FetchType.LAZY)
+    @Transient
+    @ManyToMany(mappedBy = "roles")
     private List<User> users;
 
     public Role(String role) {
@@ -42,7 +43,7 @@ public class Role implements GrantedAuthority {
     @Override
     public String toString() {
         return "Role{" +
-               "role='" + role + '\'' +
+               "role='" + this.role + '\'' +
                ", id=" + id +
                ", users=" + users +
                '}';

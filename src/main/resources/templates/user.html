@@ -1,33 +1,24 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Show User</title>
+    <meta charset="UTF-8">
+    <title>Личный кабинет пользователя</title>
 </head>
 <body>
-<div>
-    <a href="/admin/users">Users</a>
-</div>
-<form th:action="@{/logout}" method="post">
-    <button type="submit">Logout</button>
-</form>
-<hr>
-<div>
-    <h1>Show User</h1>
-    <h1 th:text="${user.username}">Username</h1>
-    <span th:text="'User ID: ' + ${user.id}"></span>
-    <p>User Roles:</p>
-    <ul>
-        <li th:each="role : ${user.roles}" th:text="${role.role}"></li>
-    </ul>
-</div>
-<div>
-    <a th:href="@{/admin/edit(id=${user.id})}">
-        <button type="button">EDIT</button>
-    </a>
+<h1>Личный кабинет пользователя</h1>
+<h2>Добро пожаловать, <span th:text="${user.username}">Пользователь</span>!</h2>
 
-    <form th:action="@{/admin/delete(id=${user.id})}" method="post">
-        <button type="submit">DELETE</button>
-    </form>
+<div>
+    <h3>Ваша информация:</h3>
+    <p><strong>Имя:</strong> <span th:text="${user.username}"></span></p>
+    <p><strong>Email:</strong> <span th:text="${user.email}"></span></p>
+    <p><strong>Роли:</strong>
+        <span th:text="${#lists.join(user.roles, ', ')}"></span>
+    </p>
+</div>
+
+<div>
+    <a href="/logout">Выйти</a>
 </div>
 </body>
 </html>

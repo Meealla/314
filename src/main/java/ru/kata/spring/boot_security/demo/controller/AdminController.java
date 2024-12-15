@@ -1,6 +1,7 @@
 package ru.kata.spring.boot_security.demo.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -10,6 +11,7 @@ import ru.kata.spring.boot_security.demo.service.UserService;
 
 @Controller
 @RequestMapping("/admin")
+@PreAuthorize("hasRole('ROLE_ADMIN')")
 public class AdminController {
 
     private final UserService userService;
@@ -36,7 +38,7 @@ public class AdminController {
     @PostMapping
     public String createUser(@ModelAttribute("user") User user) {
         userService.createUser(user);
-        return "redirect:/user";
+        return "redirect:/admin";
     }
 
     @GetMapping("/edit")
@@ -50,14 +52,14 @@ public class AdminController {
     @PostMapping("/edit")
     public String updateUser(@ModelAttribute("user") User user, @RequestParam("id") Long id) {
         userService.updateUser(id, user);
-        return "redirect:/user";
+        return "redirect:/admin";
 
     }
 
     @PostMapping("/delete")
     public String deleteUser(Model model, @RequestParam("id") Long id) {
         userService.deleteUser(id);
-        return "redirect:/user";
+        return "redirect:/admin";
     }
 }
 

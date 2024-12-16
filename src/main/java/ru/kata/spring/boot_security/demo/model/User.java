@@ -1,20 +1,17 @@
 package ru.kata.spring.boot_security.demo.model;
 
 
-import lombok.Getter;
-import lombok.Setter;
+
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+
 
 import javax.persistence.*;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
-//хэшкод переопределить
-@Getter
-@Setter
+
 @Entity
 @Table(name = "users")
 public class User implements UserDetails {
@@ -85,12 +82,52 @@ public class User implements UserDetails {
         return true;
     }
 
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public List<Role> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(List<Role> roles) {
+        this.roles = roles;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         User user = (User) o;
-        return Objects.equals(id, user.id) && Objects.equals(password, user.password) && Objects.equals(email, user.email) && Objects.equals(userName, user.userName) && Objects.equals(roles, user.roles);
+        return Objects.equals(id, user.id)
+               && Objects.equals(password, user.password)
+               && Objects.equals(email, user.email)
+               && Objects.equals(userName, user.userName)
+               && Objects.equals(roles, user.roles);
     }
 
     @Override

@@ -22,7 +22,7 @@ public class Role implements GrantedAuthority {
     private Long id;
 
 
-//    @Transient
+    @Transient
     @ManyToMany(mappedBy = "roles")
     private List<User> users;
 

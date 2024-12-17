@@ -5,9 +5,13 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import ru.kata.spring.boot_security.demo.model.Role;
 import ru.kata.spring.boot_security.demo.model.User;
 import ru.kata.spring.boot_security.demo.service.RoleService;
 import ru.kata.spring.boot_security.demo.service.UserService;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Controller
 @RequestMapping("/admin")
@@ -37,10 +41,21 @@ public class AdminController {
     }
 
     @PostMapping
-    public String createUser(@ModelAttribute("user") User user) {
+    public String createUser(@ModelAttribute("user") User user, @RequestParam(value = "roles", required = false) Long[] roleIds) {
+        List<Role> roles = new ArrayList<>();
+        if (roleIds != null) {
+            for (Long roleId : roleIds) {
+                Role role = roleService.findById(roleId);
+                if (role != null) {
+                    roles.add(role);
+                }
+            }
+        }
+        user.setRoles(roles);
         userService.createUser(user);
         return "redirect:/admin";
     }
+
 
     @GetMapping("/edit")
     public String edit(Model model, @RequestParam("id") Long id) {
@@ -63,4 +78,3 @@ public class AdminController {
         return "redirect:/admin";
     }
 }
-

@@ -12,6 +12,7 @@
         <th>ID</th>
         <th>Имя пользователя</th>
         <th>Email</th>
+        <th>Роли</th>
         <th>Действия</th>
     </tr>
     </thead>
@@ -20,6 +21,14 @@
         <td th:text="${user.id}"></td>
         <td th:text="${user.username}"></td>
         <td th:text="${user.email}"></td>
+        <td>
+            <span th:each="role, iterStat : ${user.roles}"
+                  th:text="${role.role}"
+                  th:if="${iterStat.index} == 0"></span>
+            <span th:each="role, iterStat : ${user.roles}"
+                  th:text="', ' + ${role.role}"
+                  th:if="${iterStat.index} > 0"></span>
+        </td>
         <td>
             <a th:href="@{/admin/edit(id=${user.id})}">Редактировать</a>
             <form th:action="@{/admin/delete(id=${user.id})}" method="post" style="display:inline;">

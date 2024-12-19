@@ -45,6 +45,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Override
     @Transactional
     public void createUser(User user) {
+        System.out.println("Saving user: " + user.getUsername());
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepository.save(user);
     }

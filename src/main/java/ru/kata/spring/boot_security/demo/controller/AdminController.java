@@ -10,6 +10,7 @@ import ru.kata.spring.boot_security.demo.model.User;
 import ru.kata.spring.boot_security.demo.service.RoleService;
 import ru.kata.spring.boot_security.demo.service.UserService;
 
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,20 +29,31 @@ public class AdminController {
     }
 
     @GetMapping
-    public String getAllUsers(Model model) {
+    public String getAllUsers(Model model, Principal principal) {
         model.addAttribute("users", userService.getAllUser());
+
+        String username = principal.getName();
+        User user = userService.findUserByUserName(username);
+        if (user != null) {
+            model.addAttribute("userh", user);
+        }
         return "allUser";
     }
 
     @GetMapping("/new")
-    public String createUserForm(Model model) {
+    public String createUserForm(Model model, Principal principal) {
         model.addAttribute("user", new User());
         model.addAttribute("roles", roleService.getAllRoles());
+        String username = principal.getName();
+        User user = userService.findUserByUserName(username);
+        if (user != null) {
+            model.addAttribute("userh", user);
+        }
         return "new";
     }
 
     @PostMapping
-    public String createUser(@ModelAttribute("user") User user, @RequestParam(value = "roles", required = false) Long[] roleIds) {
+    public String createUser(@ModelAttribute("user") User user, @RequestParam("roles") Long[] roleIds) {
         List<Role> roles = new ArrayList<>();
         if (roleIds != null) {
             for (Long roleId : roleIds) {

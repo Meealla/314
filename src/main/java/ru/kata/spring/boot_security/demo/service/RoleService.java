@@ -8,5 +8,8 @@ import java.util.Optional;
 public interface RoleService {
     List<Role> getAllRoles();
 
-    public Role findById(Long roleId);
+    Role findById(Long roleId);
+
+    // Объявляем новый метод в интерфейсе
+    List<Role> getRolesByIds(Long[] roleIds);
 }

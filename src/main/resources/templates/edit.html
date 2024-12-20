@@ -1,54 +1,54 @@
-<!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Редактирование пользователя</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body>
-<div class="container mt-5">
-    <h1 class="mb-4">Редактировать пользователя</h1>
-    <form th:action="@{/admin/edit(id=${user.id})}" method="post" th:object="${user}" class="needs-validation" novalidate>
-        <!-- Имя пользователя -->
-        <div class="mb-3">
-            <label for="userName" class="form-label">Имя пользователя:</label>
-            <input type="text" id="userName" th:field="*{username}" class="form-control" required />
-            <div class="invalid-feedback">
-                Пожалуйста, введите имя пользователя.
-            </div>
-        </div>
+<!--<!DOCTYPE html>-->
+<!--<html lang="en" xmlns:th="http://www.thymeleaf.org">-->
+<!--<head>-->
+<!--    <meta charset="utf-8">-->
+<!--    <meta name="viewport" content="width=device-width, initial-scale=1">-->
+<!--    <title>Редактирование пользователя</title>-->
+<!--    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">-->
+<!--</head>-->
+<!--<body>-->
+<!--<div class="container mt-5">-->
+<!--    <h1 class="mb-4">Редактировать пользователя</h1>-->
+<!--    <form th:action="@{/admin/edit(id=${user.id})}" method="post" th:object="${user}" class="needs-validation" novalidate>-->
+<!--        &lt;!&ndash; Имя пользователя &ndash;&gt;-->
+<!--        <div class="mb-3">-->
+<!--            <label for="userName" class="form-label">Имя пользователя:</label>-->
+<!--            <input type="text" id="userName" th:field="*{username}" class="form-control" required />-->
+<!--            <div class="invalid-feedback">-->
+<!--                Пожалуйста, введите имя пользователя.-->
+<!--            </div>-->
+<!--        </div>-->
 
-        <!-- Email -->
-        <div class="mb-3">
-            <label for="email" class="form-label">Email:</label>
-            <input type="email" id="email" th:field="*{email}" class="form-control" required />
-            <div class="invalid-feedback">
-                Пожалуйста, введите корректный email.
-            </div>
-        </div>
+<!--        &lt;!&ndash; Email &ndash;&gt;-->
+<!--        <div class="mb-3">-->
+<!--            <label for="email" class="form-label">Email:</label>-->
+<!--            <input type="email" id="email" th:field="*{email}" class="form-control" required />-->
+<!--            <div class="invalid-feedback">-->
+<!--                Пожалуйста, введите корректный email.-->
+<!--            </div>-->
+<!--        </div>-->
 
-        <!-- Роли -->
-        <div class="mb-3">
-            <label class="form-label">Роли:</label>
-            <div th:each="role : ${roles}" class="form-check">
-                <input type="checkbox" th:value="${role.role}" th:name="'roles'"
-                       th:checked="${user.roles.contains(role)}" class="form-check-input" />
-                <label th:text="${role.role}" class="form-check-label"></label><br/>
-            </div>
-        </div>
+<!--        &lt;!&ndash; Роли &ndash;&gt;-->
+<!--        <div class="mb-3">-->
+<!--            <label class="form-label">Роли:</label>-->
+<!--            <div th:each="role : ${roles}" class="form-check">-->
+<!--                <input type="checkbox" th:value="${role.role}" th:name="'roles'"-->
+<!--                       th:checked="${user.roles.contains(role)}" class="form-check-input" />-->
+<!--                <label th:text="${role.role}" class="form-check-label"></label><br/>-->
+<!--            </div>-->
+<!--        </div>-->
 
-        <!-- Кнопка "Сохранить изменения" -->
-        <button type="submit" class="btn btn-primary">Сохранить изменения</button>
-    </form>
+<!--        &lt;!&ndash; Кнопка "Сохранить изменения" &ndash;&gt;-->
+<!--        <button type="submit" class="btn btn-primary">Сохранить изменения</button>-->
+<!--    </form>-->
 
-    <!-- Ссылка назад к списку пользователей -->
-    <div class="mt-3">
-        <a href="/admin" class="btn btn-secondary">Назад к списку пользователей</a>
-    </div>
-</div>
+<!--    &lt;!&ndash; Ссылка назад к списку пользователей &ndash;&gt;-->
+<!--    <div class="mt-3">-->
+<!--        <a href="/admin" class="btn btn-secondary">Назад к списку пользователей</a>-->
+<!--    </div>-->
+<!--</div>-->
 
-<!-- Подключение Bootstrap JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+<!--&lt;!&ndash; Подключение Bootstrap JS &ndash;&gt;-->
+<!--<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>-->
+<!--</body>-->
+<!--</html>-->

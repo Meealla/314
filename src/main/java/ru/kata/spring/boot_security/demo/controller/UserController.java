@@ -25,11 +25,17 @@ public class UserController {
 
     @GetMapping
     public String getUserPage(Principal principal, Model model) {
-
         String username = principal.getName();
         User user = userService.findUserByUserName(username);
+
         if (user != null) {
             model.addAttribute("userh", user);
+
+            // Проверяем, есть ли у пользователя роль ADMIN
+            boolean isAdmin = user.getRoles().stream()
+                    .anyMatch(role -> "ROLE_ADMIN".equals(role.getRole()));
+            model.addAttribute("isAdmin", isAdmin);
+
             return "user";
         } else {
             return "redirect:/login";

@@ -6,6 +6,8 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.kata.spring.boot_security.demo.model.Role;
 import ru.kata.spring.boot_security.demo.repositories.RoleRepository;
 
+
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -28,4 +30,18 @@ public class RoleServiceImpl implements RoleService {
         return roleRepository.findById(roleId).orElse(null);
     }
 
+    // Реализация нового метода
+    @Override
+    public List<Role> getRolesByIds(Long[] roleIds) {
+        List<Role> roles = new ArrayList<>();
+        if (roleIds != null) {
+            for (Long roleId : roleIds) {
+                Role role = findById(roleId);
+                if (role != null) {
+                    roles.add(role);
+                }
+            }
+        }
+        return roles;
+    }
 }

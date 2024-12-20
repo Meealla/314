@@ -28,6 +28,7 @@ public class AdminController {
         this.roleService = roleService;
     }
 
+    // Отображение всех пользователей
     @GetMapping
     public String getAllUsers(Model model, Principal principal) {
         model.addAttribute("users", userService.getAllUser());
@@ -37,55 +38,49 @@ public class AdminController {
         if (user != null) {
             model.addAttribute("userh", user);
         }
-        return "allUser";
+
+        // Передаем роли для выпадающего списка в модальном окне
+        model.addAttribute("roles", roleService.getAllRoles());
+
+        return "allUser"; // Возвращаем только одно представление
     }
 
+    // Форма для создания нового пользователя
     @GetMapping("/new")
     public String createUserForm(Model model, Principal principal) {
         model.addAttribute("user", new User());
         model.addAttribute("roles", roleService.getAllRoles());
+
         String username = principal.getName();
         User user = userService.findUserByUserName(username);
         if (user != null) {
             model.addAttribute("userh", user);
         }
+
         return "new";
     }
 
+    // Создание нового пользователя
     @PostMapping
     public String createUser(@ModelAttribute("user") User user, @RequestParam("roles") Long[] roleIds) {
-        List<Role> roles = new ArrayList<>();
-        if (roleIds != null) {
-            for (Long roleId : roleIds) {
-                Role role = roleService.findById(roleId);
-                if (role != null) {
-                    roles.add(role);
-                }
-            }
-        }
+        List<Role> roles = roleService.getRolesByIds(roleIds); // Используем метод из RoleService
         user.setRoles(roles);
         userService.createUser(user);
         return "redirect:/admin";
     }
 
-
-    @GetMapping("/edit")
-    public String edit(Model model, @RequestParam("id") Long id) {
-        model.addAttribute("user", userService.showUser(id));
-        model.addAttribute("roles", roleService.getAllRoles());
-        return "edit";
-
-    }
-
+    // Обновление пользователя (POST-запрос)
     @PostMapping("/edit")
-    public String updateUser(@ModelAttribute("user") User user, @RequestParam("id") Long id) {
+    public String updateUser(@ModelAttribute("user") User user, @RequestParam("id") Long id, @RequestParam("roles") Long[] roleIds) {
+        List<Role> roles = roleService.getRolesByIds(roleIds); // Используем метод из RoleService
+        user.setRoles(roles);
         userService.updateUser(id, user);
         return "redirect:/admin";
-
     }
 
+    // Удаление пользователя
     @PostMapping("/delete")
-    public String deleteUser(Model model, @RequestParam("id") Long id) {
+    public String deleteUser(@RequestParam("id") Long id) {
         userService.deleteUser(id);
         return "redirect:/admin";
     }

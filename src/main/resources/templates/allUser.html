@@ -12,9 +12,11 @@
 <nav class="navbar sticky-top navbar-light bg-dark">
     <div class="container-fluid">
         <span class="navbar-text" style="color: rgb(255, 255, 255); margin-right: 15px;">
-            <strong><span th:text="${userh.username}"></span></strong>
+            <strong>
+                <span th:text="${userh != null ? userh.username : ''}"></span>
+            </strong>
             <span class="text-light ms-2">with roles:</span>
-            <span th:each="role : ${userh.roles}" style="margin-right: 10px;" th:text="${role.role}"></span>
+            <span th:each="role : ${userh != null ? userh.roles : ''}" style="margin-right: 10px;" th:text="${role.role}"></span>
         </span>
         <form th:action="@{/logout}" method="post" class="d-inline">
             <button type="submit" class="btn btn-link text-secondary" style="text-decoration: none;">Logout</button>
@@ -44,7 +46,8 @@
                 <li class="nav-item">
                     <a href="#users-table" id="show-users-table" class="nav-link active no-refresh"
                        data-bs-toggle="tab" aria-current="true" role="tab">
-                        Users Table</a>
+                        Users Table
+                    </a>
                 </li>
                 <li class="nav-item">
                     <a href="/admin/new" id="show-new-user-form" class="nav-link no-refresh"
@@ -57,10 +60,11 @@
             <!-- Таблица пользователей -->
             <div class="card">
                 <div class="card-header">
-                    <h5>All User</h5>
+                    <h5>All Users</h5>
                 </div>
                 <div class="card-body">
                     <table class="table table-hover">
+                        <thead>
                         <tr>
                             <th scope="col">ID</th>
                             <th scope="col">Имя</th>
@@ -69,10 +73,12 @@
                             <th scope="col">Изменить</th>
                             <th scope="col">Удалить</th>
                         </tr>
+                        </thead>
+                        <tbody>
                         <tr th:each="user : ${users}">
                             <th scope="row" th:text="${user.id}"></th>
-                            <td th:text="${user.username}"></td>
-                            <td th:text="${user.email}"></td>
+                            <td th:text="${user.username}" th:id="${'usernameDisplay' + user.id}"></td>
+                            <td th:text="${user.email}" th:id="${'emailDisplay' + user.id}"></td>
                             <td>
                                 <span th:each="role : ${user.roles}" th:text="${role.role}"></span>
                             </td>
@@ -97,42 +103,33 @@
                                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
                                             </div>
                                             <div class="modal-body">
-                                                <form id="editUserForm" th:action="@{/admin/edit}" method="post">
+                                                <form th:id="${'editUserForm' + user.id}" th:action="@{/admin/edit}" method="post">
                                                     <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                                                    <input type="hidden" th:id="${'editUserId' + user.id}" name="id" th:value="${user.id}"/>
 
-                                                    <!-- Скрытое поле для ID пользователя -->
-                                                    <input type="hidden" id="editUserId" name="id" th:value="${user.id}"/>
-
-                                                    <!-- Имя пользователя -->
                                                     <div class="mb-3">
-                                                        <label for="username" class="form-label">Имя</label>
-                                                        <input id="username" type="text" class="form-control" name="username" th:value="${user.username}" required>
+                                                        <label th:for="${'editUsername' + user.id}" class="form-label">Имя</label>
+                                                        <input th:id="${'editUsername' + user.id}" type="text" class="form-control" name="username" th:value="${user.username}" autocomplete="name" required>
                                                     </div>
-
-                                                    <!-- Email пользователя -->
                                                     <div class="mb-3">
-                                                        <label for="userEmail" class="form-label">Email</label>
-                                                        <input id="userEmail" type="email" class="form-control" name="email" th:value="${user.email}" required>
+                                                        <label th:for="${'editUserEmail' + user.id}" class="form-label">Email</label>
+                                                        <input th:id="${'editUserEmail' + user.id}" type="email" class="form-control" name="email" th:value="${user.email}" autocomplete="email" required>
                                                     </div>
-
-                                                    <!-- Пароль пользователя -->
                                                     <div class="mb-3">
-                                                        <label for="userPassword" class="form-label">Пароль</label>
-                                                        <input id="userPassword" type="password" class="form-control" name="password" th:value="${user.password}" required>
+                                                        <label th:for="${'editUserPassword' + user.id}" class="form-label">Пароль</label>
+                                                        <input th:id="${'editUserPassword' + user.id}" type="password" class="form-control" name="password" th:value="${user.password}" autocomplete="current-password" required>
                                                     </div>
-
-                                                    <!-- Роли пользователя -->
                                                     <div class="mb-3">
-                                                        <label for="roles" class="form-label">Роли</label>
-                                                        <select id="roles" name="roles" class="form-select" multiple>
+                                                        <label th:for="${'editRoles' + user.id}" class="form-label">Роли</label>
+                                                        <select th:id="${'editRoles' + user.id}" name="roles" class="form-select" multiple>
                                                             <option th:each="role : ${roles}" th:value="${role.id}" th:text="${role.role}" th:selected="${user.roles != null && user.roles.contains(role)}"></option>
                                                         </select>
                                                     </div>
                                                 </form>
                                             </div>
                                             <div class="modal-footer d-flex justify-content-end">
-                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">close</button>
-                                                <button type="submit" form="editUserForm" class="btn btn-primary">edit</button>
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                                                <button type="submit" th:form="${'editUserForm' + user.id}" class="btn btn-primary">Сохранить</button>
                                             </div>
                                         </div>
                                     </div>
@@ -159,49 +156,40 @@
                                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
                                             </div>
                                             <div class="modal-body">
-                                                <form id="deleteUserForm" th:action="@{/admin/delete}" method="post">
-                                                    <!-- CSRF-токен -->
+                                                <form th:id="${'deleteUserForm' + user.id}" th:action="@{/admin/delete}" method="post">
                                                     <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                                                    <input type="hidden" th:id="${'deleteUserId' + user.id}" name="id" th:value="${user.id}"/>
 
-                                                    <!-- Скрытое поле для ID пользователя -->
-                                                    <input type="hidden" id="deleteUserId" name="id" th:value="${user.id}"/>
-
-                                                    <!-- Имя пользователя -->
                                                     <div class="mb-3">
-                                                        <label for="deleteUsername" class="form-label">Имя</label>
-                                                        <input id="deleteUsername" type="text" class="form-control" th:value="${user.username}" readonly>
+                                                        <label th:for="${'deleteUsername' + user.id}" class="form-label">Имя</label>
+                                                        <input th:id="${'deleteUsername' + user.id}" type="text" class="form-control" th:value="${user.username}" readonly>
                                                     </div>
-
-                                                    <!-- Email пользователя -->
                                                     <div class="mb-3">
-                                                        <label for="deleteUserEmail" class="form-label">Email</label>
-                                                        <input id="deleteUserEmail" type="email" class="form-control" th:value="${user.email}" readonly>
+                                                        <label th:for="${'deleteUserEmail' + user.id}" class="form-label">Email</label>
+                                                        <input th:id="${'deleteUserEmail' + user.id}" type="email" class="form-control" th:value="${user.email}" readonly>
                                                     </div>
-
-                                                    <!-- Пароль пользователя -->
                                                     <div class="mb-3">
-                                                        <label for="deleteUserPassword" class="form-label">Пароль</label>
-                                                        <input id="deleteUserPassword" type="password" class="form-control" th:value="${user.password}" readonly>
+                                                        <label th:for="${'deleteUserPassword' + user.id}" class="form-label">Пароль</label>
+                                                        <input th:id="${'deleteUserPassword' + user.id}" type="password" class="form-control" th:value="${user.password}" readonly>
                                                     </div>
-
-                                                    <!-- Роли пользователя -->
                                                     <div class="mb-3">
-                                                        <label for="deleteUserRoles" class="form-label">Роли</label>
-                                                        <select id="deleteUserRoles" name="roles" class="form-select" multiple disabled>
+                                                        <label th:for="${'deleteUserRoles' + user.id}" class="form-label">Роли</label>
+                                                        <select th:id="${'deleteUserRoles' + user.id}" name="roles" class="form-select" multiple disabled>
                                                             <option th:each="role : ${user.roles}" th:value="${role.id}" th:text="${role.role}"></option>
                                                         </select>
                                                     </div>
                                                 </form>
                                             </div>
                                             <div class="modal-footer d-flex justify-content-end">
-                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">close</button>
-                                                <button type="submit" form="deleteUserForm" class="btn btn-danger">delete</button>
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                                                <button type="submit" th:form="${'deleteUserForm' + user.id}" class="btn btn-danger">Удалить</button>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </td>
                         </tr>
+                        </tbody>
                     </table>
                 </div>
             </div>

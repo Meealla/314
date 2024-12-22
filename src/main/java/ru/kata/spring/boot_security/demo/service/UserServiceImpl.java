@@ -36,7 +36,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    @Transactional(readOnly = true)
+    @Transactional
     public List<User> getAllUser() {
         return userRepository.findAll();
     }
@@ -53,7 +53,12 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Override
     @Transactional
     public void updateUser(Long id, User user) {
-        userRepository.save(user);
+        User existingUser = userRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("User not found"));
+        existingUser.setUserName(user.getUsername());
+        existingUser.setEmail(user.getEmail());
+        existingUser.setPassword(passwordEncoder.encode(user.getPassword()));
+        existingUser.setRoles(user.getRoles());
+        userRepository.save(existingUser);
     }
 
     @Override
@@ -63,15 +68,19 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    @Transactional(readOnly = true)
+    @Transactional
     public User showUser(Long id) {
         return userRepository.findById(id).orElse(null);
     }
 
     @Override
-    @Transactional(readOnly = true)
+    @Transactional
     public User findUserByUserName(String username) {
         return userRepository.findByUserName(username);
     }
 
+    @Override
+    public User getUserById(Long id) {
+        return userRepository.findById(id).orElse(null);
+    }
 }

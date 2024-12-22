@@ -62,17 +62,13 @@ public class AdminController {
     }
 
     @PostMapping("/edit")
-    public String updateUser(@ModelAttribute("user") User user, @RequestParam("id") Long id, @RequestParam("roles") Long[] roleIds, Model model, Principal principal) {
+    public String updateUser(@ModelAttribute("user") User user,
+                             @RequestParam("id") Long id,
+                             @RequestParam("roles") Long[] roleIds) {
         List<Role> roles = roleService.getRolesByIds(roleIds);
         user.setRoles(roles);
         userService.updateUser(id, user);
-
-        //Получаем обновлённого пользователя, используя ID (надежнее, чем по имени)
-        User updatedUser = userService.getUserById(id);  //Добавьте этот метод в UserService
-
-        model.addAttribute("users", userService.getAllUser());
-        model.addAttribute("userh", updatedUser); // Добавили обновленного пользователя
-        return "allUser"; // Возвращаем view, а не redirect
+        return "redirect:/admin";
     }
 
     @PostMapping("/delete")

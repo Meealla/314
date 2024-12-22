@@ -13,10 +13,10 @@
     <div class="container-fluid">
         <span class="navbar-text" style="color: rgb(255, 255, 255); margin-right: 15px;">
             <strong>
-                <span th:text="${userh != null ? userh.username : ''}"></span>
+                <span th:text="${userh != null ? userh.userName : ''}"></span>
             </strong>
             <span class="text-light ms-2">with roles:</span>
-            <span th:each="role : ${userh != null ? userh.roles : ''}" style="margin-right: 10px;" th:text="${role.role}"></span>
+            <span th:each="role : ${userh.roles}" th:text="${role.role}" style="margin-right: 10px;"></span>
         </span>
         <form th:action="@{/logout}" method="post" class="d-inline">
             <button type="submit" class="btn btn-link text-secondary" style="text-decoration: none;">Logout</button>
@@ -77,7 +77,7 @@
                         <tbody>
                         <tr th:each="user : ${users}">
                             <th scope="row" th:text="${user.id}"></th>
-                            <td th:text="${user.username}" th:id="${'usernameDisplay' + user.id}"></td>
+                            <td th:text="${user.userName}" th:id="${'userNameDisplay' + user.id}"></td>
                             <td th:text="${user.email}" th:id="${'emailDisplay' + user.id}"></td>
                             <td>
                                 <span th:each="role : ${user.roles}" th:text="${role.role}"></span>
@@ -86,7 +86,7 @@
                                 <!-- Кнопка для открытия модального окна редактирования -->
                                 <a href="#"
                                    th:data-id="${user.id}"
-                                   th:data-username="${user.username}"
+                                   th:data-userName="${user.userName}"
                                    th:data-email="${user.email}"
                                    th:data-password="${user.password}"
                                    th:data-roles="${user.roles}"
@@ -108,8 +108,8 @@
                                                     <input type="hidden" th:id="${'editUserId' + user.id}" name="id" th:value="${user.id}"/>
 
                                                     <div class="mb-3">
-                                                        <label th:for="${'editUsername' + user.id}" class="form-label">Имя</label>
-                                                        <input th:id="${'editUsername' + user.id}" type="text" class="form-control" name="username" th:value="${user.username}" autocomplete="name" required>
+                                                        <label th:for="${'editUserName' + user.id}" class="form-label">Имя</label>
+                                                        <input th:id="${'editUserName' + user.id}" type="text" class="form-control" name="userName" th:value="${user.userName}" autocomplete="name" required>
                                                     </div>
                                                     <div class="mb-3">
                                                         <label th:for="${'editUserEmail' + user.id}" class="form-label">Email</label>
@@ -139,7 +139,7 @@
                                 <!-- Кнопка для открытия модального окна удаления -->
                                 <a href="#"
                                    th:data-id="${user.id}"
-                                   th:data-username="${user.username}"
+                                   th:data-userName="${user.userName}"
                                    th:data-email="${user.email}"
                                    th:data-password="${user.password}"
                                    th:data-roles="${user.roles}"
@@ -161,8 +161,8 @@
                                                     <input type="hidden" th:id="${'deleteUserId' + user.id}" name="id" th:value="${user.id}"/>
 
                                                     <div class="mb-3">
-                                                        <label th:for="${'deleteUsername' + user.id}" class="form-label">Имя</label>
-                                                        <input th:id="${'deleteUsername' + user.id}" type="text" class="form-control" th:value="${user.username}" readonly>
+                                                        <label th:for="${'deleteUserName' + user.id}" class="form-label">Имя</label>
+                                                        <input th:id="${'deleteUserName' + user.id}" type="text" class="form-control" th:value="${user.userName}" readonly>
                                                     </div>
                                                     <div class="mb-3">
                                                         <label th:for="${'deleteUserEmail' + user.id}" class="form-label">Email</label>

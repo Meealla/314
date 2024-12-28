@@ -1,6 +1,8 @@
 package ru.kata.spring.boot_security.demo.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -13,8 +15,9 @@ import ru.kata.spring.boot_security.demo.service.UserService;
 import java.security.Principal;
 
 import java.util.List;
-@Controller
-@RequestMapping("/admin")
+
+@RestController
+@RequestMapping("/api")
 @PreAuthorize("hasRole('ROLE_ADMIN')")
 public class AdminController {
 
@@ -27,53 +30,44 @@ public class AdminController {
         this.roleService = roleService;
     }
 
-    @GetMapping
-    public String getAllUsers(Model model, Principal principal) {
-        model.addAttribute("users", userService.getAllUser());
-        model.addAttribute("roles", roleService.getAllRoles());
-
-        String username = principal.getName();
-        User user = userService.findUserByUserName(username);
-        if (user != null) {
-            model.addAttribute("userh", user);
-        }
-
-        return "allUser";
+    // Все юзеры
+    @GetMapping("/users")
+    public ResponseEntity<List<User>> getAllUsers() {
+        return ResponseEntity.ok(userService.getAllUser());
     }
-    @GetMapping("/new")
-    public String createUserForm(Model model, Principal principal) {
-        model.addAttribute("user", new User());
-        model.addAttribute("roles", roleService.getAllRoles());
 
-        String username = principal.getName();
-        User user = userService.findUserByUserName(username);
-        if (user != null) {
-            model.addAttribute("userh", user);
-        }
-
-        return "new";
+    //Роли
+    @GetMapping("/roles")
+    public ResponseEntity<List<Role>> getAllRoles() {
+        return ResponseEntity.ok(roleService.getAllRoles());
     }
+
+    // Юзер по айди
+    @GetMapping("/{id}")
+    public ResponseEntity<User> getUserById(@PathVariable("id") Long id) {
+        return ResponseEntity.ok(userService.getUserById(id));
+    }
+
+    //Создание нонвого юзера
     @PostMapping
-    public String createUser(@ModelAttribute("user") User user, @RequestParam("roles") Long[] roleIds) {
-        List<Role> roles = roleService.getRolesByIds(roleIds);
-        user.setRoles(roles);
+    public ResponseEntity<HttpStatus> createUser(@RequestBody User user) {
         userService.createUser(user);
-        return "redirect:/admin";
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    @PostMapping("/edit")
-    public String updateUser(@ModelAttribute("user") User user,
-                             @RequestParam("id") Long id,
-                             @RequestParam("roles") Long[] roleIds) {
-        List<Role> roles = roleService.getRolesByIds(roleIds);
-        user.setRoles(roles);
-        userService.updateUser(id, user);
-        return "redirect:/admin";
+
+    //изменение данных юзера
+    @PutMapping("/users/{id}")
+    public ResponseEntity<HttpStatus> updateUser(@PathVariable Long id, @RequestBody User user){
+        user.setId(id);
+        userService.updateUser(user);
+        return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/delete")
-    public String deleteUser(@RequestParam("id") Long id) {
+    //удаление
+    @DeleteMapping("/{id}")
+    public ResponseEntity<HttpStatus> deleteUser(@PathVariable("id") Long id) {
         userService.deleteUser(id);
-        return "redirect:/admin";
+        return ResponseEntity.ok().build();
     }
 }

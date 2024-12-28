@@ -3,19 +3,13 @@ package ru.kata.spring.boot_security.demo.configs;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
-import ru.kata.spring.boot_security.demo.service.UserService;
-import ru.kata.spring.boot_security.demo.service.UserServiceImpl;
+
 
 
 @Configuration
@@ -33,26 +27,31 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
-                .csrf() // Включаем CSRF-защиту
-                .and()
+                .csrf(AbstractHttpConfigurer::disable) // Отключаем CSRF
                 .authorizeRequests()
-                .antMatchers("/css/**", "/js/**").permitAll()
-                .antMatchers("/login").permitAll()
-                .antMatchers("/user/**").hasAnyRole("ADMIN", "USER")
-                .antMatchers("/admin/**").hasRole("ADMIN")
-                .antMatchers("/logout").permitAll() // Разрешаем доступ к /logout
-                .anyRequest().authenticated()
+                .antMatchers("/**").permitAll() // Разрешаем доступ ко всем эндпоинтам
                 .and()
-                .formLogin()
-                .loginPage("/login")
-                .successHandler(successUserHandler)
-                .permitAll()
-                .and()
-                .logout()
-                .logoutUrl("/logout")
-                .logoutSuccessUrl("/login")
-                .invalidateHttpSession(true)
-                .permitAll();
+                .formLogin().disable() // Отключаем форму логина
+                .logout().disable(); // Отключаем логаут
+//                .csrf(AbstractHttpConfigurer::disable)
+//                .authorizeRequests()
+//                .antMatchers("/css/**", "/js/**").permitAll()
+//                .antMatchers("/login").permitAll()
+//                .antMatchers("/user/**").permitAll()
+//                .antMatchers("/admin/**").permitAll()
+//                .antMatchers("/logout").permitAll()
+//                .anyRequest().authenticated()
+//                .and()
+//                .formLogin()
+//                .loginPage("/login")
+//             .successHandler(successUserHandler)
+//                .permitAll()
+//                .and()
+//                .logout()
+//                .logoutUrl("/logout")
+//                .logoutSuccessUrl("/login")
+//                .invalidateHttpSession(true)
+//                .permitAll();
     }
 
 //    @Bean

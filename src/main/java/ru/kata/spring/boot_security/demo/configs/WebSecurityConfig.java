@@ -9,7 +9,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 
 
 @Configuration
@@ -27,31 +27,32 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
-                .csrf(AbstractHttpConfigurer::disable) // Отключаем CSRF
-                .authorizeRequests()
-                .antMatchers("/**").permitAll() // Разрешаем доступ ко всем эндпоинтам
+                .csrf() // Включаем CSRF-защиту
                 .and()
-                .formLogin().disable() // Отключаем форму логина
-                .logout().disable(); // Отключаем логаут
-//                .csrf(AbstractHttpConfigurer::disable)
-//                .authorizeRequests()
-//                .antMatchers("/css/**", "/js/**").permitAll()
-//                .antMatchers("/login").permitAll()
-//                .antMatchers("/user/**").permitAll()
-//                .antMatchers("/admin/**").permitAll()
-//                .antMatchers("/logout").permitAll()
-//                .anyRequest().authenticated()
-//                .and()
-//                .formLogin()
-//                .loginPage("/login")
-//             .successHandler(successUserHandler)
-//                .permitAll()
-//                .and()
-//                .logout()
-//                .logoutUrl("/logout")
-//                .logoutSuccessUrl("/login")
-//                .invalidateHttpSession(true)
-//                .permitAll();
+                .authorizeRequests()
+                .antMatchers("/css/**", "/js/**").permitAll()
+                .antMatchers("/login").permitAll()
+                .antMatchers("/user/**").hasAnyRole("ADMIN", "USER")
+                .antMatchers("/admin/**").hasRole("ADMIN") // Разрешить доступ к HTML-страницам
+                .antMatchers("/api/**").hasRole("ADMIN") // REST APIv
+                .antMatchers("/logout").permitAll() // Разрешаем доступ к /logout
+                .anyRequest().authenticated()
+                .and()
+                .formLogin()
+                .loginPage("/login")
+                .successHandler(successUserHandler)
+                .permitAll()
+                .and()
+                .logout()
+                .logoutUrl("/logout")
+                .logoutSuccessUrl("/login")
+                .invalidateHttpSession(true)
+                .permitAll();
+    }
+
+
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        registry.addResourceHandler("/static/**").addResourceLocations("classpath:/static/");
     }
 
 //    @Bean

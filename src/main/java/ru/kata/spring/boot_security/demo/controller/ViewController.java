@@ -1,8 +1,8 @@
-package ru.kata.spring.boot_security.demo.controller;
-
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-
+//package ru.kata.spring.boot_security.demo.controller;
+//
+//import org.springframework.stereotype.Controller;
+//import org.springframework.web.bind.annotation.GetMapping;
+//
 //@Controller
 //public class ViewController {
 //
@@ -12,9 +12,4 @@ import org.springframework.web.bind.annotation.GetMapping;
 //        return "admin"; // Возвращает HTML-шаблон admin.html
 //    }
 //
-//    // Страница создания нового пользователя
-//    @GetMapping("/admin/new")
-//    public String newUserPage() {
-//        return "new"; // Возвращает HTML-шаблон newUser.html
-//    }
 //}

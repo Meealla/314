@@ -2,9 +2,19 @@
 document.addEventListener('DOMContentLoaded', () => {
 
     const url = 'http://localhost:8088/api/admin';
+    const userUrl = 'http://localhost:8088/api/user';
 
     async function getRoles() {
-        return await fetch("http://localhost:8088/api/admin/roles").then(response => response.json());
+        try {
+            const response = await fetch("http://localhost:8088/api/admin/roles");
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return await response.json();
+        } catch (error) {
+            console.error("Ошибка при получении ролей:", error);
+            return [];
+        }
     }
 
     function listRoles() {
@@ -23,7 +33,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function getUserData() {
         fetch(url)
-            .then(res => res.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
             .then(data => {
                 if (Array.isArray(data)) {
                     loadTable(data);
@@ -34,9 +49,15 @@ document.addEventListener('DOMContentLoaded', () => {
             .catch(error => console.error("Ошибка при получении данных пользователя:", error));
     }
 
+
     function getAllUsers() {
         fetch(url)
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
             .then(data => {
                 if (Array.isArray(data)) {
                     loadTable(data);
@@ -51,27 +72,23 @@ document.addEventListener('DOMContentLoaded', () => {
         let res = '';
         if (Array.isArray(listAllUsers)) {
             listAllUsers.forEach(user => {
-                res +=
-                    `<tr>
-                    <td>${user.id}</td>
-                    <td>${user.userName}</td>
-                    <td>${user.email}</td>
-                    <td>${user.roles ? user.roles.map(role => " " + role.role.substring(5)) : ""}</td>
-                    <td>
-                        <button class="btn btn-info" type="button"
-                        data-bs-toggle="modal" data-bs-target="#editModal"
-                        onclick="editModal(${user.id})">Edit</button></td>
-                    <td>
-                        <button class="btn btn-danger" type="button"
-                        data-bs-toggle="modal" data-bs-target="#deleteModal"
-                        onclick="deleteModal(${user.id})">Delete</button></td>
-                </tr>`;
+                res += `
+              <tr>
+                  <td>${user.id}</td>
+                  <td>${user.userName}</td>
+                  <td>${user.email}</td>
+                  <td>${user.roles ? user.roles.map(role => " " + role.role.substring(5)).join(', ') : ""}</td>
+                  <td><button class="btn btn-info" type="button" data-bs-toggle="modal" data-bs-target="#editModal" onclick="editModal(${user.id})">Edit</button></td>
+                  <td><button class="btn btn-danger" type="button" data-bs-toggle="modal" data-bs-target="#deleteModal" onclick="deleteModal(${user.id})">Delete</button></td>
+              </tr>`;
             });
         } else {
             console.error("Ожидался массив, но получено:", listAllUsers);
         }
         document.getElementById('tableBodyAdmin').innerHTML = res;
     }
+
+
     getAllUsers();
 
     document.getElementById('newUserForm').addEventListener('submit', (e) => {
@@ -95,42 +112,50 @@ document.addEventListener('DOMContentLoaded', () => {
                 roles: rolesAddUser
             })
         })
-            .then((response) => {
-                if (response.ok) {
-                    getUserData();
-                    document.getElementById("show-users-table").click();
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
                 }
+                getUserData();
+                document.getElementById("show-users-table").click();
             })
             .catch(error => console.error("Ошибка при создании пользователя:", error));
     });
 
-    function editModal(id) {
-        fetch('http://localhost:8088/api/admin/users/' + id, {
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json;charset=UTF-8'
-            }
-        }).then(res => {
-            res.json().then(async u => {
-                document.getElementById('editId').value = u.id;
-                document.getElementById('editNameU').value = u.userName;
-                document.getElementById('editEmail').value = u.email;
-                document.getElementById('editPassword').value = u.password;
-                const allRoles = await getRoles();
-
-                const rolesSelect = document.getElementById('editRole');
-                rolesSelect.innerHTML = '';
-
-                allRoles.forEach(role => {
-                    const option = document.createElement('option');
-                    option.value = role.id;
-                    option.textContent = role.role;
-                    option.selected = u.roles && u.roles.some(userRole => userRole.id === role.id);
-                    rolesSelect.appendChild(option);
-                });
+    async function editModal(id) {
+        try {
+            const response = await fetch('http://localhost:8088/api/admin/users/' + id, {
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json;charset=UTF-8'
+                }
             });
-        })
-            .catch(error => console.error("Ошибка при получении пользователя для редактирования:", error));
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const u = await response.json();
+            document.getElementById('editId').value = u.id;
+            document.getElementById('editNameU').value = u.userName;
+            document.getElementById('editEmail').value = u.email;
+            document.getElementById('editPassword').value = u.password;
+            const allRoles = await getRoles();
+
+            const rolesSelect = document.getElementById('editRole');
+            rolesSelect.innerHTML = '';
+
+            allRoles.forEach(role => {
+                const option = document.createElement('option');
+                option.value = role.id;
+                option.textContent = role.role;
+                option.selected = u.roles && u.roles.some(userRole => userRole.id === role.id);
+                rolesSelect.appendChild(option);
+            });
+
+        }
+        catch (error) {
+            console.error("Ошибка при получении пользователя для редактирования:", error);
+        }
     }
 
     async function editUser() {
@@ -158,42 +183,53 @@ document.addEventListener('DOMContentLoaded', () => {
             roles: listOfRole
         };
 
-        await fetch('http://localhost:8088/api/admin/users/' + user.id, {
-            method: "PUT",
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json;charset=UTF-8'
-            },
-            body: JSON.stringify(user)
-        })
-            .then(() => {
-                closeModal();
-                getUserData();
-            })
-            .catch(error => console.error("Ошибка при обновлении пользователя:", error));
+        try {
+            const response = await fetch('http://localhost:8088/api/admin/users/' + user.id, {
+                method: "PUT",
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json;charset=UTF-8'
+                },
+                body: JSON.stringify(user)
+            });
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            closeModal();
+            getUserData();
+        }
+        catch (error) {
+            console.error("Ошибка при обновлении пользователя:", error);
+        }
     }
 
-    function deleteModal(id) {
-        fetch('http://localhost:8088/api/admin/users/' + id, {
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json;charset=UTF-8'
-            }
-        }).then(res => {
-            res.json().then(u => {
-                document.getElementById('deleteId').value = u.id;
-                document.getElementById('deleteNameU').value = u.userName;
-                document.getElementById('deleteEmail').value = u.email;
-                const rolesContainer = document.getElementById('deleteRole');
-                rolesContainer.innerHTML = '';
-                u.roles.forEach(role => {
-                    const option = document.createElement('option');
-                    option.textContent = role.role;
-                    rolesContainer.appendChild(option);
-                });
+    async function deleteModal(id) {
+        try {
+            const response = await fetch('http://localhost:8088/api/admin/users/' + id, {
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json;charset=UTF-8'
+                }
             });
-        })
-            .catch(error => console.error("Ошибка при получении пользователя для удаления:", error));
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const u = await response.json();
+            document.getElementById('deleteId').value = u.id;
+            document.getElementById('deleteNameU').value = u.userName;
+            document.getElementById('deleteEmail').value = u.email;
+            const rolesContainer = document.getElementById('deleteRole');
+            rolesContainer.innerHTML = '';
+            u.roles.forEach(role => {
+                const option = document.createElement('option');
+                option.textContent = role.role;
+                rolesContainer.appendChild(option);
+            });
+        }
+        catch (error) {
+            console.error("Ошибка при получении пользователя для удаления:", error);
+        }
     }
 
     async function deleteUser() {
@@ -205,13 +241,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 "Content-Type": "application/json"
             }
         };
-
-        fetch(urlDel, method)
-            .then(() => {
-                closeModal();
-                getUserData();
-            })
-            .catch(error => console.error("Ошибка при удалении пользователя:", error));
+        try {
+            const response = await fetch(urlDel, method);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            closeModal();
+            getUserData();
+        }
+        catch(error){
+            console.error("Ошибка при удалении пользователя:", error)
+        }
     }
 
     function closeModal() {
@@ -219,8 +259,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function getCurrentUser() {
-        fetch('http://localhost:8088/api/user')
-            .then(res => res.json())
+        fetch(userUrl)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
             .then(user => {
                 document.getElementById('usernamePlaceholder').textContent = user.email;
                 document.getElementById('userRoles').textContent = user.roles ? user.roles.map(role => role.role.substring(5)).join(", ") : "";
@@ -229,40 +274,5 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     getCurrentUser();
-    const userUrl = 'http://localhost:8088/api/user';
 
-    function getUserPage() {
-        fetch(userUrl)
-            .then(response => response.json())
-            .then(user => {
-                getInformationAboutUser(user);
-            })
-            .catch(error => console.error("Ошибка при получении данных пользователя:", error));
-    }
-
-    function getInformationAboutUser(user) {
-        let result = '';
-        result +=
-            `<tr>
-            <td>${user.id}</td>
-            <td>${user.name}</td>
-            <td>${user.email}</td>
-            <td>${user.roles ? user.roles.map(role => " " + role.name.substring(5)) : ""}</td>
-        </tr>`;
-        document.getElementById('userTableBody').innerHTML = result;
-    }
-
-    function getCurrentUser() {
-        fetch(userUrl)
-            .then(res => res.json())
-            .then(user => {
-                document.getElementById('usernamePlaceholder').textContent = user.email;
-                document.getElementById('userRoles').textContent = user.roles ? user.roles.map(role => role.name.substring(5)).join(", ") : "";
-            })
-            .catch(error => console.error("Ошибка при получении текущего пользователя:", error));
-    }
-
-// Инициализация
-    getUserPage();
-    getCurrentUser();
 });

@@ -10,8 +10,5 @@ public class Auth {
     public String login() {
         return "/login";
     }
-
-    public String redirectLogin() {
-        return "/index";
-    }
+    
 }

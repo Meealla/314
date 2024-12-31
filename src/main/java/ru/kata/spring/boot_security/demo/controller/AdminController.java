@@ -17,8 +17,7 @@ import java.security.Principal;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api")
-@PreAuthorize("hasRole('ROLE_ADMIN')")
+@RequestMapping("/api/admin")
 public class AdminController {
 
     private final UserService userService;
@@ -30,42 +29,41 @@ public class AdminController {
         this.roleService = roleService;
     }
 
-    // Все юзеры
-    @GetMapping("/users")
+    @GetMapping
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<List<User>> getAllUsers() {
         return ResponseEntity.ok(userService.getAllUser());
     }
 
-    //Роли
     @GetMapping("/roles")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<List<Role>> getAllRoles() {
         return ResponseEntity.ok(roleService.getAllRoles());
     }
 
-    // Юзер по айди
-    @GetMapping("/{id}")
+    @GetMapping("/users/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<User> getUserById(@PathVariable("id") Long id) {
         return ResponseEntity.ok(userService.getUserById(id));
     }
 
-    //Создание нонвого юзера
-    @PostMapping
+    @PostMapping("/users")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<HttpStatus> createUser(@RequestBody User user) {
         userService.createUser(user);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-
-    //изменение данных юзера
     @PutMapping("/users/{id}")
-    public ResponseEntity<HttpStatus> updateUser(@PathVariable Long id, @RequestBody User user){
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<HttpStatus> updateUser(@PathVariable Long id, @RequestBody User user) {
         user.setId(id);
         userService.updateUser(user);
         return ResponseEntity.ok().build();
     }
 
-    //удаление
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/users/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<HttpStatus> deleteUser(@PathVariable("id") Long id) {
         userService.deleteUser(id);
         return ResponseEntity.ok().build();

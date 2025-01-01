@@ -1,4 +1,15 @@
-document.addEventListener('DOMContentLoaded', () => {
+// Получение текущего пользователя
+function getCurrentUser() {
+    fetch('http://localhost:8088/api/user')
+        .then(response => response.json())
+        .then(user => {
+            document.getElementById('usernamePlaceholder').textContent = user.email;
+            document.getElementById('userRoles').textContent = user.roles ? user.roles.map(role => role.role.substring(5)).join(", ") : "";
+        })
+        .catch(error => console.error("Ошибка при получении текущего пользователя:", error));
+}
+
+getCurrentUser();document.addEventListener('DOMContentLoaded', () => {
 
     const userUrl = 'http://localhost:8088/api/user';
 

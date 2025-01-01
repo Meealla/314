@@ -1,19 +1,15 @@
 ﻿const url = 'http://localhost:8088/api/admin';
 
-// Получение ролей
-function getRoles() {
-    return fetch(url + '/roles')
-        .then(response => response.json())
-        .catch(error => console.error("Ошибка при получении ролей:", error));
+async function getRoles() {
+    return await fetch("http://localhost:8088/api/admin/roles").then(response => response.json());
 }
 
-// Заполнение ролей в выпадающих списках
-function listRoles() {
-    getRoles().then(roles => {
-        let tmp = '';
-        roles.forEach(role => {
-            tmp += `<option value="${role.id}">${role.role}</option>`;
-        });
+function listRoles() { //GET Response for Roles and write in HTML
+    let tmp = '';
+    getRoles().then(roles => roles.forEach(role => {
+        tmp += `<option value="${role.id}">${role.role}</option>`;
+    })).then(r => {
+        console.log('listRoles');
         document.getElementById('editRole').innerHTML = tmp;
         document.getElementById('deleteRole').innerHTML = tmp;
         document.getElementById('role_select').innerHTML = tmp;
@@ -22,142 +18,186 @@ function listRoles() {
 
 listRoles();
 
-// Получение данных всех пользователей
-function getAllUsers() {
+function getUserData() {
     fetch(url)
-        .then(response => response.json())
-        .then(data => loadTable(data))
-        .catch(error => console.error("Ошибка при получении пользователей:", error));
+        .then(res => res.json())
+        .then(data => {
+            loadTable(data);
+        });
 }
 
-// Загрузка данных в таблицу
-function loadTable(users) {
+function getAllUsers() {
+    fetch(url).then(response => response.json()).then(user =>
+        loadTable(user));
+}
+
+function loadTable(listAllUsers) {
     let res = '';
-    users.forEach(user => {
-        res += `
-            <tr>
+    for (let user of listAllUsers) {
+        res +=
+            `<tr>
                 <td>${user.id}</td>
                 <td>${user.userName}</td>
                 <td>${user.email}</td>
-                <td>${user.roles ? user.roles.map(role => role.role.substring(5)).join(', ') : ""}</td>
-                <td><button class="btn btn-info" data-bs-toggle="modal" data-bs-target="#editModal" onclick="editModal(${user.id})">Edit</button></td>
-                <td><button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal" onclick="deleteModal(${user.id})">Delete</button></td>
+                <td>${user.roles ? user.roles.map(role => " " + role.role.substring(5)) : ""}</td>
+                <td>
+                    <button class="btn btn-info" type="button"
+                    data-bs-toggle="modal" data-bs-target="#editModal"
+                    onclick="editModal(${user.id})">Edit</button></td>
+                <td>
+                    <button class="btn btn-danger" type="button"
+                    data-bs-toggle="modal" data-bs-target="#deleteModal"
+                    onclick="deleteModal(${user.id})">Delete</button></td>
             </tr>`;
-    });
+    }
     document.getElementById('tableBodyAdmin').innerHTML = res;
 }
-
 getAllUsers();
 
-// Создание нового пользователя
+// Новый юзер
 document.getElementById('newUserForm').addEventListener('submit', (e) => {
     e.preventDefault();
-    let roles = [];
-    Array.from(document.getElementById('role_select').options).forEach(option => {
-        if (option.selected) {
-            roles.push({ id: option.value, role: 'ROLE_' + option.text });
+    let role = document.getElementById('role_select');
+    let rolesAddUser = [];
+    for (let i = 0; i < role.options.length; i++) {
+        if (role.options[i].selected) {
+            rolesAddUser.push({ id: role.options[i].value, role: 'ROLE_' + role.options[i].innerHTML });
         }
-    });
+    }
     fetch(url + '/users', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+            'Content-Type': 'application/json;charset=utf-8'
+        },
         body: JSON.stringify({
             userName: document.getElementById('newName').value,
             email: document.getElementById('newEmail').value,
             password: document.getElementById('newPassword').value,
-            roles: roles
+            roles: rolesAddUser
         })
     })
-        .then(response => {
+        .then((response) => {
             if (response.ok) {
-                getAllUsers();
+                getUserData();
                 document.getElementById("show-users-table").click();
             }
-        })
-        .catch(error => console.error("Ошибка при создании пользователя:", error));
+        });
 });
 
-// Редактирование пользователя
+//Изменение юзера
 function editModal(id) {
-    fetch(url + '/users/' + id)
-        .then(response => response.json())
-        .then(user => {
-            document.getElementById('editId').value = user.id;
-            document.getElementById('editNameU').value = user.userName;
-            document.getElementById('editEmail').value = user.email;
-            document.getElementById('editPassword').value = user.password;
+    fetch(url + '/users/' + id, {
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json;charset=UTF-8'
+        }
+    }).then(res => {
+        res.json().then(async u => {
+            document.getElementById('editId').value = u.id;
+            document.getElementById('editNameU').value = u.userName;
+            document.getElementById('editEmail').value = u.email;
+            document.getElementById('editPassword').value = u.password;
+            const allRoles = await getRoles();
+
             const rolesSelect = document.getElementById('editRole');
             rolesSelect.innerHTML = '';
-            getRoles().then(roles => {
-                roles.forEach(role => {
-                    const option = document.createElement('option');
-                    option.value = role.id;
-                    option.textContent = role.role;
-                    option.selected = user.roles && user.roles.some(userRole => userRole.id === role.id);
-                    rolesSelect.appendChild(option);
-                });
+
+            allRoles.forEach(role => {
+                const option = document.createElement('option');
+                option.value = role.id;
+                option.textContent = role.role;
+                option.selected = u.roles && u.roles.some(userRole => userRole.id === role.id);
+                rolesSelect.appendChild(option);
             });
-        })
-        .catch(error => console.error("Ошибка при получении пользователя:", error));
+        });
+    });
 }
 
-function editUser() {
-    const user = {
-        id: document.getElementById('editId').value,
-        userName: document.getElementById('editNameU').value,
-        email: document.getElementById('editEmail').value,
-        password: document.getElementById('editPassword').value,
-        roles: Array.from(document.getElementById('editRole').options)
-            .filter(option => option.selected)
-            .map(option => ({ id: option.value }))
+async function editUser() {
+    const rolesSelect = document.getElementById('editRole'); // Получаем элемент select
+
+    let idValue = document.getElementById("editId").value;
+    let nameValue = document.getElementById('editNameU').value;
+    let emailValue = document.getElementById('editEmail').value;
+    let passwordValue = document.getElementById("editPassword").value;
+    let listOfRole = [];
+    for (let i = 0; i < rolesSelect.options.length; i++) {
+        if (rolesSelect.options[i].selected) {
+            let tmp = {};
+            tmp["id"] = rolesSelect.options[i].value;
+            listOfRole.push(tmp);
+        }
+    }
+    let user = {
+        id: idValue,
+        userName: nameValue,
+        email: emailValue,
+        password: passwordValue,
+        roles: listOfRole
     };
-    fetch(url + '/users/' + user.id, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+    await fetch(url + '/users/' + user.id, {
+        method: "PUT",
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json;charset=UTF-8'
+        },
         body: JSON.stringify(user)
-    })
-        .then(response => {
-            if (response.ok) {
-                closeModal();
-                getAllUsers();
-            }
-        })
-        .catch(error => console.error("Ошибка при обновлении пользователя:", error));
+    });
+    closeModal();
+    getUserData();
 }
 
-// Удаление пользователя
+// Удаление юзера
 function deleteModal(id) {
-    fetch(url + '/users/' + id)
-        .then(response => response.json())
-        .then(user => {
-            document.getElementById('deleteId').value = user.id;
-            document.getElementById('deleteNameU').value = user.userName;
-            document.getElementById('deleteEmail').value = user.email;
+    fetch(url + '/users/' + id, {
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json;charset=UTF-8'
+        }
+    }).then(res => {
+        res.json().then(u => {
+            document.getElementById('deleteId').value = u.id;
+            document.getElementById('deleteNameU').value = u.userName;
+            document.getElementById('deleteEmail').value = u.email;
             const rolesContainer = document.getElementById('deleteRole');
             rolesContainer.innerHTML = '';
-            user.roles.forEach(role => {
+            u.roles.forEach(role => {
                 const option = document.createElement('option');
                 option.textContent = role.role;
                 rolesContainer.appendChild(option);
             });
-        })
-        .catch(error => console.error("Ошибка при получении пользователя:", error));
+        });
+    });
 }
 
-function deleteUser() {
-    const id = document.getElementById('deleteId').value;
-    fetch(url + '/users/' + id, { method: 'DELETE' })
-        .then(response => {
-            if (response.ok) {
-                closeModal();
-                getAllUsers();
-            }
-        })
-        .catch(error => console.error("Ошибка при удалении пользователя:", error));
+async function deleteUser() {
+    const id = document.getElementById("deleteId").value;
+    console.log(id);
+    let urlDel = url + "/users/" + id;
+    let method = {
+        method: 'DELETE',
+        headers: {
+            "Content-Type": "application/json"
+        }
+    };
+
+    fetch(urlDel, method).then(() => {
+        closeModal();
+        getUserData();
+    });
 }
 
-// Закрытие модальных окон
 function closeModal() {
-    document.querySelectorAll(".btn-close").forEach(btn => btn.click());
+    document.querySelectorAll(".btn-close").forEach((btn) => btn.click());
 }
 
+function getCurrentUser() {
+    fetch('http://localhost:8088/api/user')
+        .then(res => res.json())
+        .then(user => {
+            document.getElementById('usernamePlaceholder').textContent = user.userName;
+            document.getElementById('userRoles').textContent = user.roles ? user.roles.map(role => role.role.substring(5)).join(', ') : "";
+        });
+}
+
+getCurrentUser();

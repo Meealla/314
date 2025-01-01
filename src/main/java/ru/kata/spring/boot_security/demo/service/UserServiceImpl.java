@@ -46,12 +46,26 @@ public class UserServiceImpl implements UserService{
         if (user.getId() == null) {
             throw new IllegalArgumentException("User ID must not be null");
         }
-        User existingUser = userRepository.findById(user.getId()).orElseThrow(() -> new IllegalArgumentException("User not found"));
-        if (!passwordEncoder.matches(user.getPassword(), existingUser.getPassword())) {
+        User existingUser = userRepository.findById(user.getId())
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        // Обновляем имя пользователя
+        existingUser.setUserName(user.getUserName());
+
+        // Обновляем email пользователя
+        existingUser.setEmail(user.getEmail());
+
+        // Обновляем пароль, если он был изменен
+        if (user.getPassword() != null && !user.getPassword().isEmpty() &&
+            !passwordEncoder.matches(user.getPassword(), existingUser.getPassword())) {
             existingUser.setPassword(passwordEncoder.encode(user.getPassword()));
         }
+        // Обновляем роли
+        existingUser.setRoles(user.getRoles());
+
         userRepository.save(existingUser);
     }
+
 
     @Override
     @Transactional

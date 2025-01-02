@@ -4,13 +4,30 @@ function getCurrentUser() {
         .then(response => response.json())
         .then(user => {
             document.getElementById('usernamePlaceholder').textContent = user.email;
-            document.getElementById('userRoles').textContent = user.roles ? user.roles.map(role => role.role.substring(5)).join(", ") : "";
+            document.getElementById('userRoles')
+                .textContent = user.roles ? user.roles
+                .map(role => role.role.substring(5))
+                .join(", ") : "";
+
+            checkUserRoleAndAdjustUI(user); // Проверяем роль и настраиваем UI
         })
         .catch(error => console.error("Ошибка при получении текущего пользователя:", error));
 }
 
-getCurrentUser();document.addEventListener('DOMContentLoaded', () => {
+// Функция для проверки роли и настройки UI
+function checkUserRoleAndAdjustUI(user) {
+    const adminLink = document.querySelector('a[href="/admin"]').parentElement; // Находим элемент с ссылкой на админ панель
 
+    if (user.roles && user.roles.some(role => role.role === "ROLE_ADMIN")) {
+        adminLink.style.display = 'block'; // Показываем кнопку "Admin" для админа
+    } else {
+        adminLink.style.display = 'none'; // Скрываем кнопку "Admin" для пользователя
+    }
+}
+
+getCurrentUser();
+
+document.addEventListener('DOMContentLoaded', () => {
     const userUrl = 'http://localhost:8088/api/user';
 
     function getUserPage() {
@@ -42,21 +59,5 @@ getCurrentUser();document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('userTableBody').innerHTML = result;
     }
 
-    function getCurrentUser() {
-        fetch(userUrl)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                return response.json()
-            })
-            .then(user => {
-                document.getElementById('usernamePlaceholder').textContent = user.email;
-                document.getElementById('userRoles').textContent = user.roles ? user.roles.map(role => role.role.substring(5)).join(", ") : "";
-            })
-            .catch(error => console.error("Ошибка при получении текущего пользователя:", error));
-    }
-
     getUserPage();
-    getCurrentUser();
 });

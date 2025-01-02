@@ -4,7 +4,7 @@ async function getRoles() {
     return await fetch("http://localhost:8088/api/admin/roles").then(response => response.json());
 }
 
-function listRoles() { //GET Response for Roles and write in HTML
+function listRoles() {
     let tmp = '';
     getRoles().then(roles => roles.forEach(role => {
         tmp += `<option value="${role.id}">${role.role}</option>`;
@@ -114,7 +114,7 @@ function editModal(id) {
 }
 
 async function editUser() {
-    const rolesSelect = document.getElementById('editRole'); // Получаем элемент select
+    const rolesSelect = document.getElementById('editRole');
 
     let idValue = document.getElementById("editId").value;
     let nameValue = document.getElementById('editNameU').value;
@@ -202,9 +202,9 @@ function getCurrentUser() {
 
 getCurrentUser();
 
-// Обработка клика на вкладку "New User"
+// Обработка клика  new user
 document.getElementById('show-new-user-form').addEventListener('click', function (event) {
-    event.preventDefault(); // Предотвращаем стандартное поведение ссылки
-    var tab = new bootstrap.Tab(this); // Инициализируем вкладку
-    tab.show(); // Показываем вкладку
+    event.preventDefault();
+    var tab = new bootstrap.Tab(this);
+    tab.show();
 });

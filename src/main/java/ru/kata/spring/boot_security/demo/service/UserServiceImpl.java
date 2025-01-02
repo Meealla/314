@@ -1,9 +1,6 @@
 package ru.kata.spring.boot_security.demo.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,7 +32,7 @@ public class UserServiceImpl implements UserService{
     @Override
     @Transactional
     public void createUser(User user) {
-        System.out.println("Saving user: " + user.getUsername());
+        System.out.println(user.getUsername());
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepository.save(user);
     }
@@ -44,28 +41,19 @@ public class UserServiceImpl implements UserService{
     @Transactional
     public void updateUser(User user) {
         if (user.getId() == null) {
-            throw new IllegalArgumentException("User ID must not be null");
+            throw new IllegalArgumentException("User null");
         }
         User existingUser = userRepository.findById(user.getId())
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
-
-        // Обновляем имя пользователя
+                .orElseThrow(() -> new IllegalArgumentException("Юзер не найдер"));
         existingUser.setUserName(user.getUserName());
-
-        // Обновляем email пользователя
         existingUser.setEmail(user.getEmail());
-
-        // Обновляем пароль, если он был изменен
         if (user.getPassword() != null && !user.getPassword().isEmpty() &&
             !passwordEncoder.matches(user.getPassword(), existingUser.getPassword())) {
             existingUser.setPassword(passwordEncoder.encode(user.getPassword()));
         }
-        // Обновляем роли
         existingUser.setRoles(user.getRoles());
-
         userRepository.save(existingUser);
     }
-
 
     @Override
     @Transactional

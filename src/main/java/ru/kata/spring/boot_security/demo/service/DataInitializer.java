@@ -42,7 +42,7 @@ public class DataInitializer implements CommandLineRunner {
         }
         User user = userRepository.findByUserName("user");
         if (user == null) {
-            user = new User("1234", "user@mail", "User");
+            user = new User("1234", "user@mail", "user");
             user.setRoles(List.of(roleRepository.findByRole("ROLE_USER")));
             userService.createUser(user);
         }

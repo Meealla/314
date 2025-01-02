@@ -8,9 +8,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/")
 public class ViewController {
 
-    /* Главная страница администратора */
+
     @GetMapping("/admin")
     public String adminPage() {
-        return "admin"; /* Возвращает HTML-шаблон admin.html */
+        return "admin";
+    }
+        @GetMapping("/user")
+        public String userPage() {
+            return "user";
+
     }
 }

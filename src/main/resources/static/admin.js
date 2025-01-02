@@ -201,3 +201,10 @@ function getCurrentUser() {
 }
 
 getCurrentUser();
+
+// Обработка клика на вкладку "New User"
+document.getElementById('show-new-user-form').addEventListener('click', function (event) {
+    event.preventDefault(); // Предотвращаем стандартное поведение ссылки
+    var tab = new bootstrap.Tab(this); // Инициализируем вкладку
+    tab.show(); // Показываем вкладку
+});

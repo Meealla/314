@@ -10,12 +10,13 @@ public class ViewController {
 
 
     @GetMapping("/admin")
-    public String adminPage() {
+    public String getAdminPage() {
         return "admin";
     }
-        @GetMapping("/user")
-        public String userPage() {
-            return "user";
+
+    @GetMapping("/user")
+    public String getUserPage() {
+        return "user";
 
     }
 }

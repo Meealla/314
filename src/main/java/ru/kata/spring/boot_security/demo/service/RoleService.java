@@ -10,6 +10,5 @@ public interface RoleService {
 
     Role findById(Long roleId);
 
-    // Объявляем новый метод в интерфейсе
     List<Role> getRolesByIds(Long[] roleIds);
 }

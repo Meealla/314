@@ -18,6 +18,7 @@ public interface UserService {
     User showUser(Long id);
 
     User findUserByUserName(String username);
+
     User getUserById(Long id);
 }
 

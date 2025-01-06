@@ -52,6 +52,7 @@ function loadTable(listAllUsers) {
     }
     document.getElementById('tableBodyAdmin').innerHTML = res;
 }
+
 getAllUsers();
 
 // Новый юзер
@@ -61,7 +62,7 @@ document.getElementById('newUserForm').addEventListener('submit', (e) => {
     let rolesAddUser = [];
     for (let i = 0; i < role.options.length; i++) {
         if (role.options[i].selected) {
-            rolesAddUser.push({ id: role.options[i].value, role: 'ROLE_' + role.options[i].innerHTML });
+            rolesAddUser.push({id: role.options[i].value, role: 'ROLE_' + role.options[i].innerHTML});
         }
     }
     fetch(url + '/users', {

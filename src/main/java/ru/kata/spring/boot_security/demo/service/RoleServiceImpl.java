@@ -30,7 +30,6 @@ public class RoleServiceImpl implements RoleService {
         return roleRepository.findById(roleId).orElse(null);
     }
 
-    // Реализация нового метода
     @Override
     public List<Role> getRolesByIds(Long[] roleIds) {
         List<Role> roles = new ArrayList<>();
